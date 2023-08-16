@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -31,8 +30,8 @@ public class Game {
     public int gameID;
     private String word;
     private Guild guild;
-    private String[][][] layout;
-    private String[][] stage;
+    private String[] layout;
+    private String stage;
 
     public Game(SlashCommandInteractionEvent event, OptionMapping layout, String challengerID, String opponentID) {
         setGuild(event);
@@ -52,7 +51,7 @@ public class Game {
     }
 
     public void showSubmission(SlashCommandInteractionEvent event) {
-        setStage(0);
+        setStage(0); // dead hangman
         EmbedBuilder embed = getEmbedBuilder();
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("accept", "\uD83D\uDFE2 Accept"));
@@ -148,19 +147,11 @@ public class Game {
         this.stage = this.layout[stage];
     }
 
-    private void setLayout(int designIndex) {
-        this.layout = new String[][][]{hangman_layout[designIndex]};
+    private void setLayout(int layoutIndex) {
+        this.layout = hangman_layout[layoutIndex];
     }
 
     private String printHangman() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("```");
-        for (String[] s : this.stage) {
-            sb.append(Arrays.toString(s)).append("\n");
-        }
-        sb.append("```");
-
-        return sb.toString();
+        return "```" + this.stage + "```";
     }
 }

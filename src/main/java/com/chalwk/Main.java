@@ -17,8 +17,10 @@ import org.reflections.Reflections;
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.logging.Level;
 
+import static com.chalwk.game.Globals.hangman_layout;
 import static com.chalwk.util.Authentication.getToken;
 import static org.reflections.Reflections.log;
 
