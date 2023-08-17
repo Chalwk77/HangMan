@@ -19,16 +19,16 @@ import static com.chalwk.game.Globals.words;
 import static com.chalwk.game.PrivateMessage.privateMessage;
 
 public class Game {
-    public String whos_turn;
     public String challengerID;
     public String opponentID;
     public String challengerName;
     public String opponentName;
+    public String whos_turn;
     public boolean started = false;
     public int gameID;
+    public int state;
     public String word;
     private Guild guild;
-    public int state;
     private String[] layout;
     private String stage;
     private String embedID;
@@ -53,36 +53,15 @@ public class Game {
     public void showSubmission(SlashCommandInteractionEvent event) {
         this.state = 0;
         setStage(this.state); // dead hangman
-        EmbedBuilder embed = getEmbedBuilder();
+
+        EmbedBuilder embed = getEmbed();
+        embed.setDescription("You have been invited to play Hangman.");
+
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("accept", "\uD83D\uDFE2 Accept"));
         buttons.add(Button.danger("decline", "\uD83D\uDD34 Decline"));
         buttons.add(Button.secondary("cancel", "\uD83D\uDEAB Cancel"));
         event.replyEmbeds(embed.build()).addActionRow(buttons).queue();
-    }
-
-    private EmbedBuilder getEmbedBuilder() {
-
-        String botName = getBotName();
-        String botAvatar = getBotAvatar();
-
-        EmbedBuilder embed = new EmbedBuilder();
-        embed.setTitle("\uD83D\uDD74 \uD80C\uDF6F Hangman \uD80C\uDF6F \uD83D\uDD74");
-        embed.setDescription("You have been invited to play Hangman.");
-        embed.addField("Challenger:", "<@" + this.challengerID + ">", true);
-        embed.addField("Opponent:", "<@" + this.opponentID + ">", true);
-        embed.addField("Hangman:", printHangman(), false);
-
-        embed.setFooter(botName + " - Copyright (c) 2023. Jericho Crosby", botAvatar);
-        return embed;
-    }
-
-    public void addCharacter(MessageReceivedEvent event, String input) {
-        Member member = event.getMember();
-        String name = member.getEffectiveName();
-        //EmbedBuilder embed = getEmbed();
-        //event.editMessageEmbeds(embed.build()).queue();
-        //gameOver(game, event);
     }
 
     public EmbedBuilder getEmbed() {
@@ -107,10 +86,14 @@ public class Game {
 
     private void initializeGame(ButtonInteractionEvent event) {
         newRandomWord();
+
         this.started = true;
         this.state = layout.length - 1;
+        this.whos_turn = whoStarts();
+
         setStage(this.state);
         EmbedBuilder embed = getEmbed();
+        embed.setDescription("The game has started. " + this.whos_turn + " goes first.");
         embed.addField("Guess a letter or the word:", word.length() + " characters", false);
         embed.addField("Characters:", "```" + "〔 〕".repeat(word.length()) + "```", false);
         event.replyEmbeds(embed.build()).queue();
@@ -121,13 +104,9 @@ public class Game {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                setEmbedID( event.getChannel().getLatestMessageId());
+                setEmbedID(event.getChannel().getLatestMessageId());
             }
         }, 500);
-    }
-
-    private void setEmbedID(String embedID) {
-        this.embedID = embedID;
     }
 
     void acceptInvitation(ButtonInteractionEvent event) {
@@ -149,8 +128,12 @@ public class Game {
         return this.gameID;
     }
 
-    public String getEmbedID(){
+    public String getEmbedID() {
         return this.embedID;
+    }
+
+    private void setEmbedID(String embedID) {
+        this.embedID = embedID;
     }
 
     private void newRandomWord() {

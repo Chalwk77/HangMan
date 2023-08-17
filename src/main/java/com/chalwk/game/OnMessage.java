@@ -3,7 +3,6 @@ package com.chalwk.game;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
@@ -43,7 +42,10 @@ public class OnMessage {
                     // you guessed wrong
                 }
 
+                game.state--;
                 if (guesses.size() == word.length()) {
+                    // you win
+                } else if (game.state < 0) {
                     // you lose
                 }
 
@@ -55,10 +57,20 @@ public class OnMessage {
 
     private static void updateEmbed(StringBuilder word, List<Character> guesses, Game game, MessageReceivedEvent event) {
         event.getMessage().delete().queue(); // delete the player's message input
-        EmbedBuilder embed = game.getEmbed();
         String messageID = game.getEmbedID();
 
+        String whos_turn = (game.whos_turn.equals(game.opponentName)) ? game.challengerName : game.opponentName;
+
+        EmbedBuilder embed = game.getEmbed();
+        embed.addField("Guess a letter or the word:", word.length() + " characters", false);
         embed.addField("Characters:", "```" + guessBox(word, guesses) + "```", false);
+        embed.setDescription("It is " + whos_turn + "'s turn.");
+
+        StringBuilder sb = new StringBuilder();
+        for (Character guess : guesses) {
+            sb.append(guess).append(" ");
+        }
+        embed.addField("Guesses:", sb.toString(), false);
 
         event.getChannel()
                 .retrieveMessageById(messageID)
