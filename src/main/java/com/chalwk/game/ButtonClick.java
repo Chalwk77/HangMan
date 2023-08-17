@@ -23,6 +23,8 @@ public class ButtonClick {
             if (data.memberID().equals(challengerID) || data.memberID().equals(opponentID)) {
                 if (!game.started) {
                     if (data.buttonID.equalsIgnoreCase("accept")) {
+                        if (canClick(data, opponentID, event, "You are not the opponent. Unable to accept."))
+                            continue;
                         game.acceptInvitation(event);
                     } else if (data.buttonID.equalsIgnoreCase("decline")) {
                         if (canClick(data, opponentID, event, "You are not the opponent. Unable to decline."))

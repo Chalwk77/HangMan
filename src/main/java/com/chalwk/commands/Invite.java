@@ -4,6 +4,7 @@ package com.chalwk.commands;
 
 import com.chalwk.game.Game;
 import com.chalwk.listeners.CommandInterface;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -43,10 +44,18 @@ public class Invite implements CommandInterface {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
+
+        Member member = event.getMember();
         OptionMapping option = event.getOption("opponent");
         OptionMapping layout = event.getOption("layout");
+
+        assert member != null;
+        assert option != null;
+
         if (option.getAsUser().isBot()) {
-            privateMessage(event, event.getMember(), "You cannot invite a bot to play Hangman.");
+            privateMessage(event, member, "You cannot invite a bot to play Hangman.");
+        } else if (event.getUser().getId().equals(option.getAsUser().getId())) {
+            privateMessage(event, member, "You cannot invite yourself to play Hangman.");
         } else {
             invitePlayer(event, option, layout);
         }

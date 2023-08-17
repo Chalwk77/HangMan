@@ -3,12 +3,10 @@ package com.chalwk.game;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-import static com.chalwk.game.GameOver.gameOver;
 import static com.chalwk.game.Globals.concurrentGames;
 import static com.chalwk.game.Globals.guesses;
 
@@ -16,6 +14,7 @@ public class OnMessage {
     public static void onMessage(MessageReceivedEvent event) {
 
         Member member = event.getMember();
+        if (member == null) return;
         String memberID = member.getId();
 
         for (Game game : concurrentGames) {
@@ -26,55 +25,65 @@ public class OnMessage {
 
             if (memberID.equals(challengerID) || memberID.equals(opponentID) && game.started) {
 
-                String description = null;
+                if (!yourTurn(event, game, member)) return;
+
+                String description = "THIS SHOULD NOT BE SEEN.";
                 String input = event.getMessage().getContentRaw();
                 String word = game.word;
-                //
-                // Player is attempting to guess the whole word:
-                //
+
                 if (input.length() > 1) {
                     if (input.contentEquals(word)) {
                         description = member.getEffectiveName() + " guessed the word!";
                     } else {
                         description = member.getEffectiveName() + ", that is not the word.";
+                        game.state--;
                     }
                 } else if (!getGuesses(input, new StringBuilder(word), guesses)) {
                     description = member.getEffectiveName() + ", (" + input + ") is not in the word.";
+                    game.state--;
+                } else {
+                    description = member.getEffectiveName() + " guessed a letter!";
                 }
 
-                game.state--;
-                if (guesses.size() == word.length()) {
-                    // you win
-                } else if (game.state < 0) {
-                    // you lose
-                }
-
-                game.setStage(game.state--);
+                game.setStage(game.state);
                 updateEmbed(new StringBuilder(word), guesses, game, event, description);
             }
         }
     }
 
-    private static void updateEmbed(StringBuilder word, List<Character> guesses, Game game, MessageReceivedEvent event, String description) {
-        event.getMessage().delete().queue(); // delete the player's message input
-        String messageID = game.getEmbedID();
+    private static boolean yourTurn(MessageReceivedEvent event, Game game, Member member) {
+        if (!member.getEffectiveName().equals(game.whos_turn)) {
+            event.getMessage().delete().queue();
+            return false;
+        }
+        return true;
+    }
 
-        String whos_turn = (game.whos_turn.equals(game.opponentName)) ? game.challengerName : game.opponentName;
+    private static void updateEmbed(StringBuilder word, List<Character> guesses, Game game, MessageReceivedEvent event, String description) {
+
+        game.setTurn();
+        event.getMessage().delete().queue(); // delete the player's message input
 
         EmbedBuilder embed = game.getEmbed();
-        embed.addField("Guess a letter or the word:", word.length() + " characters", false);
+        embed.setDescription("It's now " + game.whos_turn + "'s turn.");
         embed.addField("Characters:", guessBox(word, guesses), false);
+        //embed.addField(description, "", false);
 
-        description = (description == null) ? "It is " + whos_turn + "'s turn." : description;
-        embed.setDescription(description);
+        showGuesses(guesses, embed);
+        editEmbed(game, event, embed);
+    }
 
+    private static void showGuesses(List<Character> guesses, EmbedBuilder embed) {
         StringBuilder sb = new StringBuilder();
         for (Character guess : guesses) {
             sb.append(guess).append(" ");
         }
         embed.addField("Guesses:", sb.toString(), false);
+    }
+
+    private static void editEmbed(Game game, MessageReceivedEvent event, EmbedBuilder embed) {
         event.getChannel()
-                .retrieveMessageById(messageID)
+                .retrieveMessageById(game.getEmbedID())
                 .queue(message -> message.editMessageEmbeds(embed.build()).queue());
     }
 
@@ -93,9 +102,9 @@ public class OnMessage {
         return sb.toString();
     }
 
-    private static boolean getGuesses(String input, StringBuilder word, List<Character> guesses) {
-        char guess = input.charAt(0);
+    private static boolean getGuesses(String character, StringBuilder word, List<Character> guesses) {
+        char guess = character.charAt(0);
         guesses.add(guess);
-        return word.toString().contains(input);
+        return word.toString().contains(character);
     }
 }

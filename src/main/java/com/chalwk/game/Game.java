@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
@@ -84,6 +83,14 @@ public class Game {
         return (randomNum == 0) ? this.challengerName : this.opponentName;
     }
 
+    public void setTurn() {
+        this.whos_turn = (this.whos_turn.equals(this.challengerName)) ? this.opponentName : this.challengerName;
+    }
+
+    public String getTurn() {
+        return this.whos_turn;
+    }
+
     private void initializeGame(ButtonInteractionEvent event) {
         newRandomWord();
 
@@ -94,7 +101,7 @@ public class Game {
         setStage(this.state);
         EmbedBuilder embed = getEmbed();
         embed.setDescription("The game has started. " + this.whos_turn + " goes first.");
-        embed.addField("Guess a letter or the word:", word.length() + " characters", false);
+        embed.addField("Guess a letter or the word: " + word.length() + " characters", "", false);
         embed.addField("Characters:", "```" + "〔 〕".repeat(word.length()) + "```", false);
         event.replyEmbeds(embed.build()).queue();
         setMessageID(event);
@@ -138,6 +145,7 @@ public class Game {
 
     private void newRandomWord() {
         this.word = words[new Random().nextInt(words.length)];
+        System.out.println("Word: " + this.word);
     }
 
     void setStage(int stage) {
