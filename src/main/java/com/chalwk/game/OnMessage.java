@@ -71,7 +71,6 @@ public class OnMessage {
             sb.append(guess).append(" ");
         }
         embed.addField("Guesses:", sb.toString(), false);
-
         event.getChannel()
                 .retrieveMessageById(messageID)
                 .queue(message -> message.editMessageEmbeds(embed.build()).queue());
