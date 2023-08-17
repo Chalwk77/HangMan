@@ -28,8 +28,9 @@ public class Game {
     public String opponentName;
     public boolean started = false;
     public int gameID;
-    private String word;
+    public String word;
     private Guild guild;
+    public int stage_index;
     private String[] layout;
     private String stage;
 
@@ -108,14 +109,13 @@ public class Game {
 
     private void initializeGame(EmbedBuilder embed, ButtonInteractionEvent event) {
         newRandomWord();
-        setStage(this.layout.length);
+        setStage(this.layout.length - 1);
         embed.addField("Hangman:", printHangman(), false);
         embed.addField("Guess a letter or the word:", word.length() + " characters", false);
         embed.addField("Word:", "```" +
                 "〔 〕".repeat(word.length()) +
                 "```", false);
         event.replyEmbeds(embed.build()).queue();
-
         this.started = true;
     }
 
@@ -143,7 +143,7 @@ public class Game {
         this.word = words[new Random().nextInt(words.length)];
     }
 
-    private void setStage(int stage) {
+    void setStage(int stage) {
         this.stage = this.layout[stage];
     }
 
@@ -151,7 +151,7 @@ public class Game {
         this.layout = hangman_layout[layoutIndex];
     }
 
-    private String printHangman() {
+    String printHangman() {
         return "```" + this.stage + "```";
     }
 }

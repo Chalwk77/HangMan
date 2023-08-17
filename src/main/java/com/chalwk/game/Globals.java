@@ -2,6 +2,9 @@
 
 package com.chalwk.game;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Globals {
 
     public static final String[][] hangman_layout = {
@@ -84,6 +87,8 @@ public class Globals {
     };
 
     public static Game[] concurrentGames = new Game[0];
+
+    public static List<Character> guesses = new ArrayList<>();
 
     public static String[] words = {
             "aback",

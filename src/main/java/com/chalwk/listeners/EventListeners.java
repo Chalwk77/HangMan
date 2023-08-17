@@ -3,7 +3,7 @@
 package com.chalwk.listeners;
 
 import com.chalwk.game.ButtonClick;
-import com.chalwk.game.Guesses;
+import com.chalwk.game.OnMessage;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -35,6 +35,6 @@ public class EventListeners extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        Guesses.onMessage(event);
+        OnMessage.onMessage(event);
     }
 }
