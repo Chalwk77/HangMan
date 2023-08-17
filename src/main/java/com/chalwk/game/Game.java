@@ -141,10 +141,12 @@ public class Game {
     }
 
     void setStage(int stage) {
+        if (stage < 0) stage = 0; // just in case
         this.stage = this.layout[stage];
     }
 
     private void setLayout(int layoutIndex) {
+        if (layoutIndex < 0) layoutIndex = 0; // just in case
         this.layout = hangman_layout[layoutIndex];
     }
 

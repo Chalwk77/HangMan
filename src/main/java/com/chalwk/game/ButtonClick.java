@@ -30,13 +30,12 @@ public class ButtonClick {
                         game.declineInvitation(event, data.member);
                     } else if (data.buttonID.equalsIgnoreCase("cancel")) {
                         if (canClick(data, challengerID, event, "You are not the challenger. Unable to cancel."))
-                            return;
+                            continue;
                         game.cancelInvitation(event, data.member);
                     }
                 }
             } else {
                 privateMessage(event, data.member, "You are not part of this game.");
-                break;
             }
         }
     }
