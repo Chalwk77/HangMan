@@ -87,7 +87,7 @@ public class Globals {
                     """
                     ┌────────┐
                     │        │
-                    │      (o_o)
+                    │      (x_x)
                     │      /O|O\\
                     │      | | |
                     │       / \\
