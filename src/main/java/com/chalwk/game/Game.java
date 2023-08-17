@@ -30,9 +30,10 @@ public class Game {
     public int gameID;
     public String word;
     private Guild guild;
-    public int stage_index;
+    public int state;
     private String[] layout;
     private String stage;
+    private String embedID;
 
     public Game(SlashCommandInteractionEvent event, OptionMapping layout, String challengerID, String opponentID) {
         setGuild(event);
@@ -52,7 +53,8 @@ public class Game {
     }
 
     public void showSubmission(SlashCommandInteractionEvent event) {
-        setStage(0); // dead hangman
+        this.state = 0;
+        setStage(this.state); // dead hangman
         EmbedBuilder embed = getEmbedBuilder();
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("accept", "\uD83D\uDFE2 Accept"));
@@ -94,9 +96,7 @@ public class Game {
         embed.setTitle("\uD83D\uDD74 \uD80C\uDF6F Hangman \uD80C\uDF6F \uD83D\uDD74");
         embed.addField("Challenger:", "<@" + this.challengerID + ">", true);
         embed.addField("Opponent:", "<@" + this.opponentID + ">", true);
-
-        this.whos_turn = this.whos_turn == null ? whoStarts() : this.whos_turn;
-        embed.addField("It's now " + this.whos_turn + "'s turn ", "", false);
+        embed.addField("Hangman:", printHangman(), false);
         embed.setFooter(botName + " - Copyright (c) 2023. Jericho Crosby", botAvatar);
         return embed;
     }
@@ -107,22 +107,21 @@ public class Game {
         return (randomNum == 0) ? this.challengerName : this.opponentName;
     }
 
-    private void initializeGame(EmbedBuilder embed, ButtonInteractionEvent event) {
+    private void initializeGame(ButtonInteractionEvent event) {
         newRandomWord();
-        setStage(this.layout.length - 1);
-        embed.addField("Hangman:", printHangman(), false);
-        embed.addField("Guess a letter or the word:", word.length() + " characters", false);
-        embed.addField("Word:", "```" +
-                "〔 〕".repeat(word.length()) +
-                "```", false);
-        event.replyEmbeds(embed.build()).queue();
         this.started = true;
+        this.state = layout.length - 1;
+        this.embedID = event.getMessageId();
+        setStage(this.state);
+        EmbedBuilder embed = getEmbed();
+        embed.addField("Guess a letter or the word:", word.length() + " characters", false);
+        embed.addField("Characters:", "```" + "〔 〕".repeat(word.length()) + "```", false);
+        event.replyEmbeds(embed.build()).queue();
     }
 
     void acceptInvitation(ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
-        EmbedBuilder currentBoard = getEmbed();
-        initializeGame(currentBoard, event);
+        initializeGame(event);
     }
 
     void declineInvitation(ButtonInteractionEvent event, Member member) {
@@ -137,6 +136,10 @@ public class Game {
 
     public int getGameID() {
         return this.gameID;
+    }
+
+    public String getEmbedID(){
+        return this.embedID;
     }
 
     private void newRandomWord() {
