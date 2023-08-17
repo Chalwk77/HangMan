@@ -27,22 +27,22 @@ public class OnMessage {
 
                 if (!yourTurn(event, game, member)) return;
 
-                String description = "THIS SHOULD NOT BE SEEN.";
+                String description;
                 String input = event.getMessage().getContentRaw();
                 String word = game.word;
 
                 if (input.length() > 1) {
                     if (input.contentEquals(word)) {
-                        description = member.getEffectiveName() + " guessed the word!";
+                        description = "✅ " + member.getEffectiveName() + " guessed the word!";
                     } else {
-                        description = member.getEffectiveName() + ", that is not the word.";
+                        description = "❌ " + member.getEffectiveName() + " guessed the word incorrectly.";
                         game.state--;
                     }
                 } else if (!getGuesses(input, new StringBuilder(word), guesses)) {
-                    description = member.getEffectiveName() + ", (" + input + ") is not in the word.";
+                    description = "❌ " + member.getEffectiveName() + ", (" + input + ") is not in the word.";
                     game.state--;
                 } else {
-                    description = member.getEffectiveName() + " guessed a letter!";
+                    description = "✅ " + member.getEffectiveName() + ", (" + input + ") is in the word.";
                 }
 
                 game.setStage(game.state);
@@ -62,12 +62,12 @@ public class OnMessage {
     private static void updateEmbed(StringBuilder word, List<Character> guesses, Game game, MessageReceivedEvent event, String description) {
 
         game.setTurn();
-        event.getMessage().delete().queue(); // delete the player's message input
+        event.getMessage().delete().queue();
 
         EmbedBuilder embed = game.getEmbed();
         embed.setDescription("It's now " + game.whos_turn + "'s turn.");
         embed.addField("Characters:", guessBox(word, guesses), false);
-        //embed.addField(description, "", false);
+        embed.addField(description, " ", false);
 
         showGuesses(guesses, embed);
         editEmbed(game, event, embed);
