@@ -10,9 +10,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static com.chalwk.Main.getBotAvatar;
 import static com.chalwk.Main.getBotName;
@@ -111,12 +109,25 @@ public class Game {
         newRandomWord();
         this.started = true;
         this.state = layout.length - 1;
-        this.embedID = event.getMessageId();
         setStage(this.state);
         EmbedBuilder embed = getEmbed();
         embed.addField("Guess a letter or the word:", word.length() + " characters", false);
         embed.addField("Characters:", "```" + "〔 〕".repeat(word.length()) + "```", false);
         event.replyEmbeds(embed.build()).queue();
+        setMessageID(event);
+    }
+
+    private void setMessageID(ButtonInteractionEvent event) {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                setEmbedID( event.getChannel().getLatestMessageId());
+            }
+        }, 500);
+    }
+
+    private void setEmbedID(String embedID) {
+        this.embedID = embedID;
     }
 
     void acceptInvitation(ButtonInteractionEvent event) {

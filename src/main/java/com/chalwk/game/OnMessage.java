@@ -3,6 +3,7 @@ package com.chalwk.game;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
@@ -15,18 +16,17 @@ public class OnMessage {
 
         Member member = event.getMember();
         String memberID = member.getId();
-        String input = event.getMessage().getContentRaw();
 
         for (Game game : concurrentGames) {
             if (game == null) continue;
-
-            String word = game.word;
 
             String challengerID = game.challengerID;
             String opponentID = game.opponentID;
 
             if (memberID.equals(challengerID) || memberID.equals(opponentID) && game.started) {
 
+                String input = event.getMessage().getContentRaw();
+                String word = game.word;
                 //
                 // Player is attempting to guess the whole word:
                 //
@@ -43,6 +43,10 @@ public class OnMessage {
                     // you guessed wrong
                 }
 
+                if (guesses.size() == word.length()) {
+                    // you lose
+                }
+
                 game.setStage(game.state--);
                 updateEmbed(new StringBuilder(word), guesses, game, event);
             }
@@ -51,13 +55,14 @@ public class OnMessage {
 
     private static void updateEmbed(StringBuilder word, List<Character> guesses, Game game, MessageReceivedEvent event) {
         event.getMessage().delete().queue(); // delete the player's message input
-        String guessBox = guessBox(word, guesses);
         EmbedBuilder embed = game.getEmbed();
-        embed.addField("Characters:", "```" + guessBox + "```", false);
         String messageID = game.getEmbedID();
-        event.getChannel().retrieveMessageById(messageID).queue(message -> {
-            message.editMessageEmbeds(embed.build()).queue();
-        });
+
+        embed.addField("Characters:", "```" + guessBox(word, guesses) + "```", false);
+
+        event.getChannel()
+                .retrieveMessageById(messageID)
+                .queue(message -> message.editMessageEmbeds(embed.build()).queue());
     }
 
     private static String guessBox(StringBuilder word, List<Character> guesses) {
