@@ -18,17 +18,19 @@ import static com.chalwk.game.Globals.words;
 import static com.chalwk.game.PrivateMessage.privateMessage;
 
 public class Game {
+
     public String challengerID;
     public String opponentID;
     public String challengerName;
     public String opponentName;
     public String whos_turn;
+    public int correct;
     public boolean started = false;
     public int gameID;
     public int state;
     public String word;
+    public String[] layout;
     private Guild guild;
-    private String[] layout;
     private String stage;
     private String embedID;
 
