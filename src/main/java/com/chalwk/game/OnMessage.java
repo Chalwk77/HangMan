@@ -28,14 +28,13 @@ public class OnMessage {
                 if (!yourTurn(event, game, member)) return;
 
                 int color = 0x00ff00; // green
-                boolean guessed_whole_word = false;
 
                 String input = event.getMessage().getContentRaw();
                 String word = game.word;
 
                 if (input.length() > 1) {
                     if (input.contentEquals(word)) { // guessed the whole word
-                        guessed_whole_word = true;
+                        game.guessed_whole_word = true;
                     } else {
                         game.state--;
                     }
@@ -45,19 +44,19 @@ public class OnMessage {
                 }
 
                 game.setStage(game.state);
-                updateEmbed(new StringBuilder(word), guesses, game, event, guessed_whole_word, color);
+                updateEmbed(new StringBuilder(word), guesses, game, event, color);
             }
         }
     }
 
-    private static void updateEmbed(StringBuilder word, List<Character> guesses, Game game, MessageReceivedEvent event, boolean guessedWholeWord, int color) {
+    private static void updateEmbed(StringBuilder word, List<Character> guesses, Game game, MessageReceivedEvent event, int color) {
 
         game.setTurn();
         event.getMessage().delete().queue();
         String guess_box = guessBox(word, guesses, game);
 
         EmbedBuilder embed = game.getEmbed();
-        if (gameOver(word, game, event, guessedWholeWord, embed)) {
+        if (gameOver(word, game, event, embed)) {
             concurrentGames[game.getGameID()] = null;
             return;
         }
@@ -77,8 +76,8 @@ public class OnMessage {
         return true;
     }
 
-    private static boolean gameOver(StringBuilder word, Game game, MessageReceivedEvent event, boolean guessed_whole_word, EmbedBuilder embed) {
-        if (word.length() == game.correct || guessed_whole_word) {
+    private static boolean gameOver(StringBuilder word, Game game, MessageReceivedEvent event, EmbedBuilder embed) {
+        if (word.length() == game.correct || game.guessed_whole_word) {
             embed.addField("\uD83D\uDFE2 GAME OVER. The word was (" + word + "). " + game.whos_turn + " wins!", " ", false);
             embed.setColor(0x00ff00);
             editEmbed(game, event, embed);

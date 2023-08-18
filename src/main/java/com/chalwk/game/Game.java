@@ -13,8 +13,7 @@ import java.util.*;
 
 import static com.chalwk.Main.getBotAvatar;
 import static com.chalwk.Main.getBotName;
-import static com.chalwk.game.Globals.hangman_layout;
-import static com.chalwk.game.Globals.words;
+import static com.chalwk.game.Globals.*;
 import static com.chalwk.game.PrivateMessage.privateMessage;
 
 public class Game {
@@ -28,6 +27,7 @@ public class Game {
     public boolean started = false;
     public int gameID;
     public int state;
+    public boolean guessed_whole_word = false;
     public String word;
     public String[] layout;
     private Guild guild;
@@ -90,10 +90,6 @@ public class Game {
         this.whos_turn = (this.whos_turn.equals(this.challengerName)) ? this.opponentName : this.challengerName;
     }
 
-    public String getTurn() {
-        return this.whos_turn;
-    }
-
     private void initializeGame(ButtonInteractionEvent event) {
         newRandomWord();
 
@@ -127,11 +123,13 @@ public class Game {
     void declineInvitation(ButtonInteractionEvent event, Member member) {
         privateMessage(event, member, "Your game invite to " + this.opponentName + " was declined.");
         event.getMessage().delete().queue();
+        concurrentGames[this.gameID] = null;
     }
 
     void cancelInvitation(ButtonInteractionEvent event, Member member) {
         privateMessage(event, member, "Your game invite to " + this.opponentName + " was cancelled.");
         event.getMessage().delete().queue();
+        concurrentGames[this.gameID] = null;
     }
 
     public int getGameID() {

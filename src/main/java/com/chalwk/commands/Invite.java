@@ -45,34 +45,32 @@ public class Invite implements CommandInterface {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
 
-        Member member = event.getMember();
-        OptionMapping option = event.getOption("opponent");
         OptionMapping layout = event.getOption("layout");
+        OptionMapping opponent = event.getOption("opponent");
+        assert opponent != null;
 
+        Member member = event.getMember();
         assert member != null;
-        assert option != null;
 
-        if (option.getAsUser().isBot()) {
-            privateMessage(event, member, "You cannot invite a bot to play Hangman.");
-        } else if (event.getUser().getId().equals(option.getAsUser().getId())) {
-            privateMessage(event, member, "You cannot invite yourself to play Hangman.");
+        String memberID = member.getId();
+        String opponentID = opponent.getAsUser().getId();
+
+        if (opponent.getAsUser().isBot()) {
+            privateMessage(event, member, "You cannot invite a bot to play Tic-Tac-Toe.");
+        } else if (memberID.equals(opponentID)) {
+            privateMessage(event, member, "You cannot invite yourself to play Tic-Tac-Toe.");
         } else {
-            invitePlayer(event, option, layout);
+            invitePlayer(event, layout, memberID, opponentID);
         }
     }
 
-    private void invitePlayer(SlashCommandInteractionEvent event, OptionMapping option, OptionMapping layout) {
-
-        String challengerID = event.getUser().getId();
-        String opponentID = option.getAsUser().getId();
-
+    private void invitePlayer(SlashCommandInteractionEvent event, OptionMapping layout, String challengerID, String opponentID) {
         int length = concurrentGames.length;
         Game[] temp = new Game[length + 1];
         System.arraycopy(concurrentGames, 0, temp, 0, length);
-
         concurrentGames = temp;
         concurrentGames[length] = new Game(event, layout, challengerID, opponentID);
-        concurrentGames[length].gameID = length;
         concurrentGames[length].showSubmission(event);
+        concurrentGames[length].gameID = length;
     }
 }
