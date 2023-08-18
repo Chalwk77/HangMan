@@ -57,15 +57,14 @@ public class OnMessage {
         String guess_box = guessBox(word, guesses, game);
 
         EmbedBuilder embed = game.getEmbed();
-
         if (gameOver(word, game, event, guessedWholeWord, embed)) {
             concurrentGames[game.getGameID()] = null;
             return;
         }
 
-        showGuesses(guesses, embed);
         embed.setDescription("It's now " + game.whos_turn + "'s turn.");
         embed.addField("Characters:", guess_box, false);
+        embed.addField("Guesses: " + showGuesses(guesses, embed), " ", false);
         embed.setColor(color);
         editEmbed(game, event, embed);
     }
@@ -93,19 +92,15 @@ public class OnMessage {
         return false;
     }
 
-    private static void showGuesses(List<Character> guesses, EmbedBuilder embed) {
+    private static String showGuesses(List<Character> guesses, EmbedBuilder embed) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < guesses.size(); i++) {
-
-            String letter = guesses.get(i).toString();
-            letter = letter.toUpperCase();
-
-            sb.append(letter);
+            sb.append(guesses.get(i).toString().toUpperCase());
             if (i != guesses.size() - 1) {
                 sb.append(", ");
             }
         }
-        embed.addField("Guesses: " + sb, " ", false);
+        return sb.toString();
     }
 
     private static void editEmbed(Game game, MessageReceivedEvent event, EmbedBuilder embed) {
