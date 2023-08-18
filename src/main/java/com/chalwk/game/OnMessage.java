@@ -27,36 +27,36 @@ public class OnMessage {
 
                 if (!yourTurn(event, game, member)) return;
 
-                EmbedBuilder embed = game.getEmbed();
-                String input = event.getMessage().getContentRaw();
-                String word = game.word;
+                int color = 0x00ff00; // green
                 boolean guessed_whole_word = false;
 
+                String input = event.getMessage().getContentRaw();
+                String word = game.word;
+
                 if (input.length() > 1) {
-                    if (input.contentEquals(word)) {
+                    if (input.contentEquals(word)) { // guessed the whole word
                         guessed_whole_word = true;
-                        embed.setColor(0x00ff00);
                     } else {
                         game.state--;
                     }
                 } else if (!getGuess(input, new StringBuilder(word), guesses)) {
                     game.state--;
-                    embed.setColor(0xff0000);
-                } else {
-                    embed.setColor(0x00ff00);
+                    color = 0xff0000; // red
                 }
 
                 game.setStage(game.state);
-                updateEmbed(embed, new StringBuilder(word), guesses, game, event, guessed_whole_word);
+                updateEmbed(new StringBuilder(word), guesses, game, event, guessed_whole_word, color);
             }
         }
     }
 
-    private static void updateEmbed(EmbedBuilder embed, StringBuilder word, List<Character> guesses, Game game, MessageReceivedEvent event, boolean guessedWholeWord) {
+    private static void updateEmbed(StringBuilder word, List<Character> guesses, Game game, MessageReceivedEvent event, boolean guessedWholeWord, int color) {
 
         game.setTurn();
         event.getMessage().delete().queue();
         String guess_box = guessBox(word, guesses, game);
+
+        EmbedBuilder embed = game.getEmbed();
 
         if (gameOver(word, game, event, guessedWholeWord, embed)) {
             concurrentGames[game.getGameID()] = null;
@@ -66,6 +66,7 @@ public class OnMessage {
         showGuesses(guesses, embed);
         embed.setDescription("It's now " + game.whos_turn + "'s turn.");
         embed.addField("Characters:", guess_box, false);
+        embed.setColor(color);
         editEmbed(game, event, embed);
     }
 

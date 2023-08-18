@@ -76,7 +76,7 @@ public class Game {
         embed.addField("Opponent:", "<@" + this.opponentID + ">", true);
         embed.addField("Hangman:", printHangman(), false);
         embed.setFooter(botName + " - Copyright (c) 2023. Jericho Crosby", botAvatar);
-        embed.setColor(0x00ff00); // green
+        embed.setColor(0x000000);
         return embed;
     }
 
@@ -153,6 +153,7 @@ public class Game {
 
     void setStage(int stage) {
         if (stage < 0) stage = 0; // just in case
+        System.out.println("Setting stage to " + stage);
         this.stage = this.layout[stage];
     }
 
