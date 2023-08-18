@@ -76,6 +76,7 @@ public class Game {
         embed.addField("Opponent:", "<@" + this.opponentID + ">", true);
         embed.addField("Hangman:", printHangman(), false);
         embed.setFooter(botName + " - Copyright (c) 2023. Jericho Crosby", botAvatar);
+        embed.setColor(0x00ff00); // green
         return embed;
     }
 

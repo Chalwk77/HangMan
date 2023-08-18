@@ -27,7 +27,7 @@ public class OnMessage {
 
                 if (!yourTurn(event, game, member)) return;
 
-                String info = null;
+                EmbedBuilder embed = game.getEmbed();
                 String input = event.getMessage().getContentRaw();
                 String word = game.word;
                 boolean guessed_whole_word = false;
@@ -35,20 +35,38 @@ public class OnMessage {
                 if (input.length() > 1) {
                     if (input.contentEquals(word)) {
                         guessed_whole_word = true;
+                        embed.setColor(0x00ff00);
                     } else {
                         game.state--;
                     }
                 } else if (!getGuess(input, new StringBuilder(word), guesses)) {
-                    info = "❌ (" + input + ") is not in the word.";
                     game.state--;
+                    embed.setColor(0xff0000);
                 } else {
-                    info = "✅ (" + input + ") is in the word.";
+                    embed.setColor(0x00ff00);
                 }
 
                 game.setStage(game.state);
-                updateEmbed(new StringBuilder(word), guesses, game, event, info, guessed_whole_word);
+                updateEmbed(embed, new StringBuilder(word), guesses, game, event, guessed_whole_word);
             }
         }
+    }
+
+    private static void updateEmbed(EmbedBuilder embed, StringBuilder word, List<Character> guesses, Game game, MessageReceivedEvent event, boolean guessedWholeWord) {
+
+        game.setTurn();
+        event.getMessage().delete().queue();
+        String guess_box = guessBox(word, guesses, game);
+
+        if (gameOver(word, game, event, guessedWholeWord, embed)) {
+            concurrentGames[game.getGameID()] = null;
+            return;
+        }
+
+        showGuesses(guesses, embed);
+        embed.setDescription("It's now " + game.whos_turn + "'s turn.");
+        embed.addField("Characters:", guess_box, false);
+        editEmbed(game, event, embed);
     }
 
     private static boolean yourTurn(MessageReceivedEvent event, Game game, Member member) {
@@ -59,28 +77,19 @@ public class OnMessage {
         return true;
     }
 
-    private static void updateEmbed(StringBuilder word, List<Character> guesses, Game game, MessageReceivedEvent event, String info, boolean guessed_whole_word) {
-
-        game.setTurn();
-        event.getMessage().delete().queue();
-        String guess_box = guessBox(word, guesses, game);
-
-        EmbedBuilder embed = game.getEmbed();
+    private static boolean gameOver(StringBuilder word, Game game, MessageReceivedEvent event, boolean guessed_whole_word, EmbedBuilder embed) {
         if (word.length() == game.correct || guessed_whole_word) {
             embed.addField("\uD83C\uDFAE❌GAME OVER. The word was (" + word + "). " + game.whos_turn + " wins!", " ", false);
+            embed.setColor(0x00ff00);
             editEmbed(game, event, embed);
-            return;
+            return true;
         } else if (game.state == 0) {
             embed.addField("\uD83C\uDFAE❌GAME OVER. The word was (" + word + "). The man was hung!", " ", false);
+            embed.setColor(0xff0000);
             editEmbed(game, event, embed);
-            return;
+            return true;
         }
-
-        showGuesses(guesses, embed);
-        embed.setDescription("It's now " + game.whos_turn + "'s turn.");
-        embed.addField(info, " ", true);
-        embed.addField("Characters:", guess_box, false);
-        editEmbed(game, event, embed);
+        return false;
     }
 
     private static void showGuesses(List<Character> guesses, EmbedBuilder embed) {
