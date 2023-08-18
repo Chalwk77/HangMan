@@ -20,6 +20,7 @@ public class Game {
 
     public String challengerID;
     public String opponentID;
+    public List<Character> guesses = new ArrayList<>();
     public String challengerName;
     public String opponentName;
     public String whos_turn;

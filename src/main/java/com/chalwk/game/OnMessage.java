@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.util.List;
 
 import static com.chalwk.game.Globals.concurrentGames;
-import static com.chalwk.game.Globals.guesses;
 
 public class OnMessage {
     public static void onMessage(MessageReceivedEvent event) {
@@ -38,22 +37,22 @@ public class OnMessage {
                     } else {
                         game.state--;
                     }
-                } else if (!getGuess(input, new StringBuilder(word), guesses)) {
+                } else if (!getGuess(input, new StringBuilder(word), game)) {
                     game.state--;
                     color = 0xff0000; // red
                 }
 
                 game.setStage(game.state);
-                updateEmbed(new StringBuilder(word), guesses, game, event, color);
+                updateEmbed(new StringBuilder(word), game, event, color);
             }
         }
     }
 
-    private static void updateEmbed(StringBuilder word, List<Character> guesses, Game game, MessageReceivedEvent event, int color) {
+    private static void updateEmbed(StringBuilder word, Game game, MessageReceivedEvent event, int color) {
 
         game.setTurn();
         event.getMessage().delete().queue();
-        String guess_box = guessBox(word, guesses, game);
+        String guess_box = guessBox(word, game);
 
         EmbedBuilder embed = game.getEmbed();
         if (gameOver(word, game, event, embed)) {
@@ -63,7 +62,7 @@ public class OnMessage {
 
         embed.setDescription("It's now " + game.whos_turn + "'s turn.");
         embed.addField("Characters:", guess_box, false);
-        embed.addField("Guesses: " + showGuesses(guesses), " ", false);
+        embed.addField("Guesses: " + showGuesses(game.guesses), " ", false);
         embed.setColor(color);
         editEmbed(game, event, embed);
     }
@@ -108,13 +107,13 @@ public class OnMessage {
                 .queue(message -> message.editMessageEmbeds(embed.build()).queue());
     }
 
-    private static String guessBox(StringBuilder word, List<Character> guesses, Game game) {
+    private static String guessBox(StringBuilder word, Game game) {
         StringBuilder sb = new StringBuilder();
         sb.append("```");
         game.correct = 0;
         for (int i = 0; i < word.length(); i++) {
             char guess = word.charAt(i);
-            if (guesses.contains(guess)) {
+            if (game.guesses.contains(guess)) {
                 game.correct++;
                 sb.append("〔").append(guess).append("〕");
             } else {
@@ -126,9 +125,9 @@ public class OnMessage {
     }
 
 
-    private static boolean getGuess(String character, StringBuilder word, List<Character> guesses) {
+    private static boolean getGuess(String character, StringBuilder word, Game game) {
         char guess = character.charAt(0);
-        guesses.add(guess);
+        game.guesses.add(guess);
         return word.toString().contains(character);
     }
 }
