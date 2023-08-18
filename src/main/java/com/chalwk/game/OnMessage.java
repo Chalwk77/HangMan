@@ -63,7 +63,7 @@ public class OnMessage {
 
         embed.setDescription("It's now " + game.whos_turn + "'s turn.");
         embed.addField("Characters:", guess_box, false);
-        embed.addField("Guesses: " + showGuesses(guesses, embed), " ", false);
+        embed.addField("Guesses: " + showGuesses(guesses), " ", false);
         embed.setColor(color);
         editEmbed(game, event, embed);
     }
@@ -91,7 +91,7 @@ public class OnMessage {
         return false;
     }
 
-    private static String showGuesses(List<Character> guesses, EmbedBuilder embed) {
+    private static String showGuesses(List<Character> guesses) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < guesses.size(); i++) {
             sb.append(guesses.get(i).toString().toUpperCase());
