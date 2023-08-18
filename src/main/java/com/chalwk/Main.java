@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 
-import static com.chalwk.game.Globals.words;
 import static com.chalwk.util.Authentication.getToken;
 import static org.reflections.Reflections.log;
 
