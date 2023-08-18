@@ -80,12 +80,12 @@ public class OnMessage {
 
     private static boolean gameOver(StringBuilder word, Game game, MessageReceivedEvent event, boolean guessed_whole_word, EmbedBuilder embed) {
         if (word.length() == game.correct || guessed_whole_word) {
-            embed.addField("\uD83C\uDFAE❌GAME OVER. The word was (" + word + "). " + game.whos_turn + " wins!", " ", false);
+            embed.addField("\uD83D\uDFE2 GAME OVER. The word was (" + word + "). " + game.whos_turn + " wins!", " ", false);
             embed.setColor(0x00ff00);
             editEmbed(game, event, embed);
             return true;
         } else if (game.state == 0) {
-            embed.addField("\uD83C\uDFAE❌GAME OVER. The word was (" + word + "). The man was hung!", " ", false);
+            embed.addField("\uD83D\uDD34 GAME OVER. The word was (" + word + "). The man was hung!", " ", false);
             embed.setColor(0xff0000);
             editEmbed(game, event, embed);
             return true;
@@ -96,7 +96,11 @@ public class OnMessage {
     private static void showGuesses(List<Character> guesses, EmbedBuilder embed) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < guesses.size(); i++) {
-            sb.append(guesses.get(i));
+
+            String letter = guesses.get(i).toString();
+            letter = letter.toUpperCase();
+
+            sb.append(letter);
             if (i != guesses.size() - 1) {
                 sb.append(", ");
             }

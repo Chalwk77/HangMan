@@ -148,12 +148,10 @@ public class Game {
 
     private void newRandomWord() {
         this.word = words[new Random().nextInt(words.length)];
-        System.out.println("Word: " + this.word);
     }
 
     void setStage(int stage) {
         if (stage < 0) stage = 0; // just in case
-        System.out.println("Setting stage to " + stage);
         this.stage = this.layout[stage];
     }
 
