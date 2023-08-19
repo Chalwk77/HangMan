@@ -51,6 +51,24 @@ public class Main {
         return botAvatar;
     }
 
+    public static Game[] addGame(Game[] games, Game game) {
+        Game[] newGames = new Game[games.length + 1];
+        System.arraycopy(games, 0, newGames, 0, games.length);
+        newGames[games.length] = game;
+        return newGames;
+    }
+
+    public static Game[] removeGame(Game[] games, Game game) {
+        Game[] newGames = new Game[games.length - 1];
+        int index = 0;
+        for (Game g : games) {
+            if (g != game) {
+                newGames[index++] = g;
+            }
+        }
+        return newGames;
+    }
+
     @NotNull
     private CommandManager loadCommands() {
         CommandManager commands = new CommandManager();
@@ -84,23 +102,5 @@ public class Main {
         botAvatar = shardManager.getShards().get(0).getSelfUser().getAvatarUrl();
 
         return shardManager;
-    }
-
-    public static Game[] addGame(Game[] games, Game game) {
-        Game[] newGames = new Game[games.length + 1];
-        System.arraycopy(games, 0, newGames, 0, games.length);
-        newGames[games.length] = game;
-        return newGames;
-    }
-
-    public static Game[] removeGame(Game[] games, Game game) {
-        Game[] newGames = new Game[games.length - 1];
-        int index = 0;
-        for (Game g : games) {
-            if (g != game) {
-                newGames[index++] = g;
-            }
-        }
-        return newGames;
     }
 }
