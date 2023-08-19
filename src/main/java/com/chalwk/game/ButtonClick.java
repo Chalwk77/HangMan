@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
-import static com.chalwk.game.Globals.concurrentGames;
+import static com.chalwk.Main.games;
 import static com.chalwk.game.PrivateMessage.privateMessage;
 
 public class ButtonClick {
@@ -14,7 +14,7 @@ public class ButtonClick {
 
         buttonData data = getButtonData(event);
 
-        for (Game game : concurrentGames) {
+        for (Game game : games) {
             if (game == null) continue;
 
             String challengerID = game.challengerID;

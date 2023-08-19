@@ -11,9 +11,9 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.util.*;
 
-import static com.chalwk.Main.getBotAvatar;
-import static com.chalwk.Main.getBotName;
-import static com.chalwk.game.Globals.*;
+import static com.chalwk.Main.*;
+import static com.chalwk.game.Globals.hangman_layout;
+import static com.chalwk.game.Globals.words;
 import static com.chalwk.game.PrivateMessage.privateMessage;
 
 public class Game {
@@ -26,7 +26,6 @@ public class Game {
     public String whos_turn;
     public int correct;
     public boolean started = false;
-    public int gameID;
     public int state;
     public boolean guessed_whole_word = false;
     public String word;
@@ -124,17 +123,13 @@ public class Game {
     void declineInvitation(ButtonInteractionEvent event, Member member) {
         privateMessage(event, member, "Your game invite to " + this.opponentName + " was declined.");
         event.getMessage().delete().queue();
-        concurrentGames[this.gameID] = null;
+        games = removeGame(games, this);
     }
 
     void cancelInvitation(ButtonInteractionEvent event, Member member) {
         privateMessage(event, member, "Your game invite to " + this.opponentName + " was cancelled.");
         event.getMessage().delete().queue();
-        concurrentGames[this.gameID] = null;
-    }
-
-    public int getGameID() {
-        return this.gameID;
+        games = removeGame(games, this);
     }
 
     public String getEmbedID() {

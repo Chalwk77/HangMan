@@ -7,7 +7,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-import static com.chalwk.game.Globals.concurrentGames;
+import static com.chalwk.Main.games;
+import static com.chalwk.Main.removeGame;
 
 public class OnMessage {
     public static void onMessage(MessageReceivedEvent event) {
@@ -16,8 +17,7 @@ public class OnMessage {
         if (member == null) return;
         String memberID = member.getId();
 
-        for (Game game : concurrentGames) {
-            if (game == null) continue;
+        for (Game game : games) {
 
             String challengerID = game.challengerID;
             String opponentID = game.opponentID;
@@ -56,7 +56,7 @@ public class OnMessage {
 
         EmbedBuilder embed = game.getEmbed();
         if (gameOver(word, game, event, embed)) {
-            concurrentGames[game.getGameID()] = null;
+            games = removeGame(games, game);
             return;
         }
 

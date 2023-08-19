@@ -682,8 +682,6 @@ public class Globals {
             }
     };
 
-    public static Game[] concurrentGames = new Game[0];
-
     public static String[] words = {
             "aare",
             "aback",
