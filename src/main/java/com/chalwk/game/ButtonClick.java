@@ -36,8 +36,6 @@ public class ButtonClick {
                         game.cancelInvitation(event, data.member);
                     }
                 }
-            } else {
-                privateMessage(event, data.member, "You are not part of this game.");
             }
         }
     }
